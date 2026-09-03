@@ -69,8 +69,85 @@ roleRef:
   kind: ClusterRole
   name: devops-platform
   apiGroup: rbac.authorization.k8s.io
+  #############################################################################
+  #kubernetes Rbac
+  ##############################################################################
+  resource "kubernetes_cluster_role" "devops_platform" {
 
+  metadata {
+    name = "devops-platform"
+  }
 
+  rule {
+    api_groups = [""]
+    resources = [
+      "pods",
+      "services",
+      "configmaps",
+      "secrets",
+      "namespaces",
+      "persistentvolumeclaims"
+    ]
 
-  
+    verbs = [
+      "get",
+      "list",
+      "watch",
+      "create",
+      "update",
+      "patch",
+      "delete"
+    ]
+  }
+
+  rule {
+    api_groups = ["apps"]
+
+    resources = [
+      "deployments",
+      "daemonsets",
+      "statefulsets",
+      "replicasets"
+    ]
+
+    verbs = [
+      "get",
+      "list",
+      "watch",
+      "create",
+      "update",
+      "patch",
+      "delete"
+    ]
+  }
+
+  rule {
+    api_groups = ["networking.k8s.io"]
+
+    resources = [
+      "ingresses"
+    ]
+
+    verbs = ["*"]
+  }
+}
+
 ``
+resource "kubernetes_cluster_role_binding" "devops_platform" {
+
+  metadata {
+    name = "devops-platform-binding"
+  }
+
+  subject {
+    kind      = "Group"
+    name      = "devops-team"
+    api_group = "rbac.authorization.k8s.io"
+  }
+
+  role_ref {
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.devops_platform.metadata[0].name
+    api_group = "rbac.authorization.k8s.io"
+  }
+}
