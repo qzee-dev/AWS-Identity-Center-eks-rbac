@@ -4,6 +4,10 @@ resource "aws_eks_access_entry" "developer" {
 
   principal_arn = var.developer_role_arn
 
+  kubernetes_groups = [
+    "developer"
+  ] 
+
   type = "STANDARD"
 }
 
