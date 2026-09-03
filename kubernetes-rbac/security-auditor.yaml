@@ -28,3 +28,46 @@ roleRef:
   kind: ClusterRole
   name: security-auditor
   apiGroup: rbac.authorization.k8s.io
+
+
+  #######################################################
+  # Kubernetes 
+  ######################################################
+  resource "kubernetes_cluster_role" "security_auditor" {
+
+  metadata {
+    name = "security-auditor"
+  }
+
+  rule {
+    api_groups = ["*"]
+    resources  = ["*"]
+
+    verbs = [
+      "get",
+      "list",
+      "watch"
+    ]
+  }
+}
+#####################################################################
+#
+######################################################################
+
+resource "kubernetes_cluster_role_binding" "security_auditor" {
+
+  metadata {
+    name = "security-auditor-binding"
+  }
+
+  subject {
+    kind      = "Group"
+    name      = "security-team"
+    api_group = "rbac.authorization.k8s.io"
+  }
+
+  role_ref {
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.security_auditor.metadata[0].name
+    api_group = "rbac.authorization.k8s.io"
+  }
